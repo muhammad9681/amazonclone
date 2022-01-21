@@ -1,16 +1,26 @@
 import Image from "next/image"
-import { SearchIcon,ShoppingBagIcon,MenuIcon } from "@heroicons/react/solid"
+import { SearchIcon,ShoppingBagIcon,MenuIcon } from "@heroicons/react/solid";
+import {signIn,signOut,useSession} from 'next-auth/react'
+import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { selectItems } from "../slices/basketSlice";
+
 const Header = () => {
+    const {data:session, status}=useSession();
+    const router=useRouter();
+    const items=useSelector(selectItems)
     return (
         <header>
  <div className="flex p-1 flex-grow bg-amazon_blue">
-            <div className="flex mt-2 items-center flex-grow sm:flex-grow-0">
+            <div className="flex mt-2 items-center flex-grow sm:flex-grow-0"
+            onClick={()=>router.push('/')}>
                     <Image
                         src='https://links.papareact.com/f90'
                         width={150}
                         height={40}
                         objectFit="contain"
-                        className="cursor-pointer" />
+                        className="cursor-pointer" 
+                        />
             </div>
                 <div className="hidden sm:flex items-center rounded-md flex-grow bg-yellow-400 hover:bg-yellow-500 my-2">
                     <input type='text' className="flex-grow text-md h-full my-2 w-6 focus:outline-none rounded-l-md px-3"/>
@@ -18,17 +28,20 @@ const Header = () => {
                 </div>
             
                 <div className="flex text-white space-x-3 items-center mx-2 text-xs md:text-sm">
-                    <div className="link white_border flex flex-col">
-                        <p>Hello,Muhammad</p>
+                    <div onClick={!session ? signIn: signOut} className="link white_border flex flex-col">
+                        <p>{ session ? `Hello,${session.user.name}` :"SignIn" }</p>
                         <p className="font-bold">Account & Lists</p>                   
                     </div>
                     <div className="link white_border flex flex-col">
                         <p>Returns</p>
                         <p className="font-bold">& Orders</p>
                     </div>
-                    <div className="link relative flex flex-col items-center white_border">
+                    <div className="link relative flex flex-col items-center white_border"
+                    onClick={()=>router.push('/checkout')}>
                         <ShoppingBagIcon className="h-10"/>
-                        <p className="absolute top-0 right-10 bg-yellow-400 rounded-lg">12</p>
+                        <p className="absolute top-0 right-10 bg-yellow-400 rounded-lg">
+                            {items.length}
+                            </p>
                         <p className="font-bold">Basket</p>
                     </div>
                 </div>
